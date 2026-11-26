@@ -41,11 +41,13 @@ start() {
   # Set VOICESTUDIO_ACCEPT_OMNIVOICE_LICENSE=0 to stop doing this.
   if [ "${VOICESTUDIO_ACCEPT_OMNIVOICE_LICENSE:-1}" = "1" ]; then
     ( for _ in $(seq 1 150); do healthy && break; sleep 2; done
-      fp=$(curl -fsS "$URL/models/licenses/details/k2-fsa%2FOmniVoice" |
-        python3 -c 'import json,sys;print(json.load(sys.stdin)["acceptance"]["fingerprint"])') &&
-      curl -fsS "$URL/models/licenses/accept" -H 'Content-Type: application/json' \
-        -d "{\"repo_id\":\"k2-fsa/OmniVoice\",\"fingerprint\":\"$fp\",\"accepted\":true}" >/dev/null &&
-      echo "[voicestudio.sh] OmniVoice non-commercial licence accepted (owner decision 2026-11-26)" >>"$VS_LOG"
+      for repo in k2-fsa/OmniVoice eustlb/higgs-audio-v2-tokenizer; do
+        fp=$(curl -fsS "$URL/models/licenses/details/${repo/\//%2F}" |
+          python3 -c 'import json,sys;print(json.load(sys.stdin)["acceptance"]["fingerprint"])') &&
+        curl -fsS "$URL/models/licenses/accept" -H 'Content-Type: application/json' \
+          -d "{\"repo_id\":\"$repo\",\"fingerprint\":\"$fp\",\"accepted\":true}" >/dev/null &&
+        echo "[voicestudio.sh] $repo licence accepted (owner decision 2026-11-26, non-commercial)" >>"$VS_LOG"
+      done
     ) >/dev/null 2>&1 &
   fi
 }
