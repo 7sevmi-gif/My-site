@@ -55,13 +55,11 @@ One continuous action per clip (Seedance drifts on multi-beat stories):
 > gnomes cheer from the roots. Maintain exact appearance from reference images,
 > consistent characters, no deformation. Cartoon, painterly, family-friendly.
 
-## Step 3: voiceover (VoiceStudio, Russian, chosen channel voice)
+## Step 3: sound
 
-Draft narration (~10 s):
-
-> Говорят, в джунглях Филиппин живут дувенде — крошечные грибные гномы. А
-> правит ими грозный Король Трюфель-Вуфель. Однажды ночью на их королевство
-> напала ужасная Мананангал…
+Owner decision: **no voiceover, sound effects only**. Seedance generates the
+audio itself (`generate_audio` on): wing flaps, screech, sword bonk, magical
+poof, tiny gnomes cheering, jungle ambience. No speech, no music.
 
 ## Status
 
