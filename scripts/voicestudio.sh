@@ -36,6 +36,18 @@ start() {
     nohup "$VS_DIR/.venv/bin/python" -m uvicorn backend.main:app \
       --host 127.0.0.1 --port "$VS_PORT" >>"$VS_LOG" 2>&1 &
   echo "VoiceStudio starting at $URL (log: $VS_LOG, output dir: $VS_OUT)"
+  # The repo owner accepted the OmniVoice licence (CC-BY-NC: NON-COMMERCIAL use
+  # only) on 2026-11-26. Containers are ephemeral, so re-record that choice.
+  # Set VOICESTUDIO_ACCEPT_OMNIVOICE_LICENSE=0 to stop doing this.
+  if [ "${VOICESTUDIO_ACCEPT_OMNIVOICE_LICENSE:-1}" = "1" ]; then
+    ( for _ in $(seq 1 150); do healthy && break; sleep 2; done
+      fp=$(curl -fsS "$URL/models/licenses/details/k2-fsa%2FOmniVoice" |
+        python3 -c 'import json,sys;print(json.load(sys.stdin)["acceptance"]["fingerprint"])') &&
+      curl -fsS "$URL/models/licenses/accept" -H 'Content-Type: application/json' \
+        -d "{\"repo_id\":\"k2-fsa/OmniVoice\",\"fingerprint\":\"$fp\",\"accepted\":true}" >/dev/null &&
+      echo "[voicestudio.sh] OmniVoice non-commercial licence accepted (owner decision 2026-11-26)" >>"$VS_LOG"
+    ) >/dev/null 2>&1 &
+  fi
 }
 
 case "${1:-start}" in
